@@ -1,11 +1,11 @@
 <p align="center">
   <h1 align="center">🔑 <ins>CrossKEY</ins><br>A 3D Cross-modal Keypoint Descriptor for MR-US Matching and Registration</h1>
   <p align="center">
-    <a href="https://author1-website.com">Daniil Morozov</a><sup>1,2</sup>
+    Daniil Morozov<sup>1,2</sup>
     ·
     <a href="https://scholar.google.com/citations?user=xdECLMkAAAAJ&hl=fr">Reuben Dorent</a><sup>3,4</sup>
     ·
-    <a href="https://author3-website.com">Nazim Haouchine</a><sup>2</sup>
+    <a href="https://scholar.google.com/citations?user=PjpzomsAAAAJ&hl=fr&oi=ao">Nazim Haouchine</a><sup>2</sup>
   </p>
   <p align="center">
     <sup>1</sup> Technical University of Munich (TUM), &nbsp;<sup>2</sup> Harvard Medical School, &nbsp;
