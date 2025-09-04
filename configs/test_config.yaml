@@ -1,0 +1,8 @@
+# Evaluation parameters (these are important for testing)
+evaluation:
+  knn_k: 1                       # K for KNN matching
+  distance_threshold: .inf       # No distance threshold
+  ratio_threshold: 0.75           # Ratio test threshold
+  mutual: true                   # Use mutual nearest neighbors
+  metric: "euclidean"            # Distance metric for matching
+  max_distance: 5.0              # Distance threshold for correct match evaluation

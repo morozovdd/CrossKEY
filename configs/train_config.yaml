@@ -1,0 +1,75 @@
+# Model architecture parameters
+model:
+  out_dim: 512                   # Output descriptor dimension
+  input_channels: 1              # Number of input channels
+
+# Loss function parameters
+loss:
+  type: "triplet"                # Type of loss: 'triplet', 'infonce', 'bce'
+  margin: 1.0                    # Margin for triplet loss
+  temperature: 0.1               # Temperature for InfoNCE loss
+  warmup_epochs: 200             # Number of epochs for curriculum learning
+  spatial_weight: 0.5            # Weight for spatial information
+  max_spatial_dist: 48.0         # Maximum spatial distance for weighting
+
+# Optimizer parameters
+optimizer:
+  learning_rate: 0.001          # Learning rate
+  weight_decay: 0.002          # Weight decay
+  eta_min: 0.000001              # Minimum learning rate for cosine annealing
+
+# Training parameters
+trainer:
+  max_epochs: 2000               # Maximum number of training epochs
+  accelerator: "auto"            # Accelerator type ('cpu', 'gpu', 'auto')
+  devices: "auto"                # Number of devices
+  log_every_n_steps: 50          # Log every N steps
+  # gradient_clip_val: 1.0         # Gradient clipping value
+
+# Data parameters
+data:
+  batch_size: 256                # Batch size
+  num_workers: 4                 # Number of data loading workers
+  patch_size: 32                 # Size of extracted patches
+  num_samples: 1024              # Number of training samples per epoch
+  grid_spacing: 8                # Grid spacing for inference
+  augment: true                  # Enable data augmentation
+  max_angle: 30.0                # Maximum rotation angle for augmentation
+  initial_angle: 0.0             # Initial rotation angle
+  angle_warmup_epochs: 1000      # Number of epochs to warm up rotation angle
+
+# Evaluation parameters
+evaluation:
+  knn_k: 1                       # Number of nearest neighbors
+  distance_threshold: inf        # Distance threshold for matching
+  ratio_threshold: 0.8           # Ratio threshold for matching
+  mutual: true                   # Use mutual nearest neighbors
+  metric: "euclidean"            # Distance metric
+  max_distance: 5.0              # Maximum distance for correct matches
+
+# Logging configuration
+logger:
+  type: "tensorboard"            # Logger type: 'tensorboard' or 'wandb'
+  save_dir: "logs/"              # Directory to save logs
+  name: "descriptor_experiment"  # Experiment name
+  project: "crossmodal-descriptor"  # Project name (for wandb)
+  tags: ["3d", "descriptor"]  # Tags for experiment
+
+# # Checkpoint configuration (using Lightning's default)
+# checkpoint:
+#   dirpath: "checkpoints/"        # Directory to save checkpoints
+#   filename: "{epoch:03d}-{train_loss:.4f}"  # Checkpoint filename pattern
+#   monitor: "train/loss"          # Metric to monitor for checkpointing
+#   mode: "min"                    # Mode for monitoring ('min' for loss)
+#   save_top_k: 3                  # Number of best checkpoints to keep
+#   save_last: true                # Save the last checkpoint
+#   every_n_epochs: 10             # Save checkpoint every N epochs
+#   save_weights_only: false       # Save full checkpoint (not just weights)
+
+# Early stopping configuration
+early_stopping:
+  enabled: true                  # Enable early stopping based on training loss
+  monitor: "train/loss"          # Metric to monitor
+  patience: 50                   # Number of epochs to wait for improvement
+  mode: "min"                    # Mode for monitoring ('min' for loss)
+  min_delta: 0.0001              # Minimum change to qualify as improvement
