@@ -1,4 +1,7 @@
 import os
+from pathlib import Path
+import sys
+sys.path.append(str(Path(__file__).resolve().parent.parent))  # Ensure src is in path
 from src.utils.sift import SIFT3D
 
 def get_files_from_folder(folder_path):
