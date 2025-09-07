@@ -1,4 +1,8 @@
-# Evaluation parameters (these are important for testing)
+# Model checkpoint
+model:
+  checkpoint_path: "logs/descriptor_experiment/version_1/checkpoints/epoch=1999-step=8000.ckpt"
+
+# Evaluation parameters
 evaluation:
   knn_k: 1                       # K for KNN matching
   distance_threshold: .inf       # No distance threshold

@@ -4,9 +4,66 @@ from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping, Learning
 from pytorch_lightning.loggers import TensorBoardLogger
 from pathlib import Path
 import torch
+import subprocess
+import sys
+import os
 
 from src.model.descriptor import Descriptor
 from src.data.datamodule import DescriptorDataModule
+
+
+def check_and_prepare_data():
+    """Check if required data exists and run preprocessing scripts if needed."""
+    print("🔍 Checking data availability...")
+    
+    # Check if SIFT descriptors exist
+    sift_output_dir = Path("data/sift_output")
+    sift_mr_files = list((sift_output_dir / "mr").glob("*_desc.csv")) if (sift_output_dir / "mr").exists() else []
+    sift_us_files = list((sift_output_dir / "synthetic_us").glob("*_desc.csv")) if (sift_output_dir / "synthetic_us").exists() else []
+    
+    # Check if heatmaps exist  
+    heatmap_dir = Path("data/heatmap")
+    heatmap_files = list(heatmap_dir.glob("*.nii.gz")) if heatmap_dir.exists() else []
+    
+    # Run SIFT extraction if needed
+    if not sift_mr_files or not sift_us_files:
+        print("📥 SIFT descriptors not found. Running SIFT extraction...")
+        try:
+            result = subprocess.run([sys.executable, "scripts/run_sift.py"], 
+                                 check=True, capture_output=True, text=True)
+            print("✅ SIFT extraction completed successfully")
+            if result.stdout:
+                print(result.stdout)
+        except subprocess.CalledProcessError as e:
+            print(f"❌ SIFT extraction failed: {e}")
+            print(f"Error output: {e.stderr}")
+            sys.exit(1)
+        except FileNotFoundError:
+            print("❌ scripts/run_sift.py not found!")
+            sys.exit(1)
+    else:
+        print("✅ SIFT descriptors found")
+    
+    # Run heatmap generation if needed
+    if not heatmap_files:
+        print("📥 Heatmaps not found. Running heatmap generation...")
+        try:
+            result = subprocess.run([sys.executable, "scripts/create_heatmaps.py"], 
+                                 check=True, capture_output=True, text=True)
+            print("✅ Heatmap generation completed successfully")
+            if result.stdout:
+                print(result.stdout)
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Heatmap generation failed: {e}")
+            print(f"Error output: {e.stderr}")
+            sys.exit(1)
+        except FileNotFoundError:
+            print("❌ scripts/create_heatmaps.py not found!")
+            sys.exit(1)
+    else:
+        print("✅ Heatmaps found")
+    
+    print("🎉 All required data is ready for training!")
 
 
 def load_config(config_path: str = "configs/train_config.yaml"):
@@ -93,6 +150,9 @@ def main():
     
     if torch.cuda.is_available():
         torch.set_float32_matmul_precision('medium')
+    
+    # Check and prepare required data (SIFT descriptors and heatmaps)
+    check_and_prepare_data()
     
     # Load configuration
     config = load_config()

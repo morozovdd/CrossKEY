@@ -59,8 +59,18 @@ def main():
     
     # Paths
     data_dir = Path("data")
-    checkpoint_path = "logs/descriptor_experiment/version_1/checkpoints/epoch=1999-step=8000.ckpt"
     config_path = "configs/test_config.yaml"
+    
+    # Load configuration
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+    
+    # Get checkpoint path from config
+    checkpoint_path = config.get('model', {}).get('checkpoint_path')
+    if not checkpoint_path:
+        print("❌ Checkpoint path not found in config file")
+        print("Please add model.checkpoint_path to configs/test_config.yaml")
+        return
     
     # Check if checkpoint exists
     if not Path(checkpoint_path).exists():
