@@ -208,5 +208,8 @@ __marimo__/
 
 # Some folders
 external_libs/
-/data/
 logs/
+
+# Data - include img folder but exclude generated outputs
+/data/heatmap/
+/data/sift_output/

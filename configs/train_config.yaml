@@ -66,10 +66,10 @@ logger:
 #   every_n_epochs: 10             # Save checkpoint every N epochs
 #   save_weights_only: false       # Save full checkpoint (not just weights)
 
-# Early stopping configuration
-early_stopping:
-  enabled: true                  # Enable early stopping based on training loss
-  monitor: "train/loss"          # Metric to monitor
-  patience: 50                   # Number of epochs to wait for improvement
-  mode: "min"                    # Mode for monitoring ('min' for loss)
-  min_delta: 0.0001              # Minimum change to qualify as improvement
+# # Early stopping configuration
+# early_stopping:
+#   enabled: true                  # Enable early stopping based on training loss
+#   monitor: "train/loss"          # Metric to monitor
+#   patience: 50                   # Number of epochs to wait for improvement
+#   mode: "min"                    # Mode for monitoring ('min' for loss)
+#   min_delta: 0.0001              # Minimum change to qualify as improvement
