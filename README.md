@@ -17,7 +17,6 @@
 <div align="center">
 
 <a href="https://arxiv.org/abs/2507.18551"><img src="https://img.shields.io/badge/arXiv-2507.18551-b31b1b" alt='arxiv'></a>
-<a href="https://colab.research.google.com/placeholder"><img src="https://img.shields.io/badge/Colab-Demo-F9AB00?logo=googlecolab&logoColor=white" alt='Colab Demo'></a>
 <a href="https://www.cancerimagingarchive.net/collection/remind/"><img src="https://img.shields.io/badge/Dataset-ReMIND-blue" alt='Dataset'></a>
 <a href="#license"><img src="https://img.shields.io/badge/License-MIT-green" alt='License'></a>
 
