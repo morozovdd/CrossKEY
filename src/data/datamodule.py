@@ -21,24 +21,31 @@ from src.utils.utils import load_nifti
 logger = logging.getLogger(__name__)
 
 
-def normalize_volume(volume: np.ndarray) -> np.ndarray:
+def normalize_volume(volume: np.ndarray, p_min: int = 1, p_max: int = 99) -> np.ndarray:
     """
-    Normalize volume using min-max normalization.
-    
+    Normalize volume using percentile-based clipping.
+
+    Clips to [p_min, p_max] percentiles before normalizing to [0, 1].
+    This is robust to outlier voxels that would compress the dynamic range
+    with simple min-max normalization.
+
     Args:
         volume: Input volume array
-        
+        p_min: Lower percentile for clipping (default: 1)
+        p_max: Upper percentile for clipping (default: 99)
+
     Returns:
         Normalized volume with values in range [0, 1]
     """
-    volume_min = volume.min()
-    volume_max = volume.max()
-    
-    if volume_max == volume_min:
+    min_value = np.percentile(volume, p_min)
+    max_value = np.percentile(volume, p_max)
+
+    if max_value == min_value:
         logger.warning("Volume has constant values, returning zeros")
         return np.zeros_like(volume)
-    
-    return (volume - volume_min) / (volume_max - volume_min)
+
+    volume_clipped = np.clip(volume, min_value, max_value)
+    return (volume_clipped - min_value) / (max_value - min_value)
 
 class DescriptorDataModule(pl.LightningDataModule):
     """
