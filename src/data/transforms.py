@@ -186,35 +186,33 @@ class BatchRotate3D:
         return affine[:3, :4]
 
     def rotate_batch(self, batch: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
-        """Rotate all image patches in batch with same random angles.
-
-        Only rotates keys that exist in the batch ('mr', 'synth_us', 'us').
-        Non-image keys are passed through unchanged.
-        """
+        """Rotate all patches in batch with same random angles."""
         angles = self._generate_random_angles()
         affine = self._get_affine_matrix(angles)
-
-        rotated_batch = dict(batch)  # shallow copy to preserve all keys
+        
+        rotated_batch = {}
         for key in ['mr', 'synth_us', 'us']:
-            if key not in batch:
-                continue
             x = batch[key].permute(0, 1, 4, 2, 3)  # [B, 1, D, H, W]
-
-            affine_batch = affine.to(x.device).unsqueeze(0).expand(x.size(0), -1, -1)
+            
             grid = F.affine_grid(
-                affine_batch,
+                affine.unsqueeze(0).repeat(x.size(0), 1, 1),
                 x.size(),
                 align_corners=False
             )
-
+            
             rotated = F.grid_sample(
-                x,
+                x, 
                 grid,
                 mode='bilinear',
                 padding_mode='zeros',
                 align_corners=False
             )
-
+            
             rotated_batch[key] = rotated.permute(0, 1, 3, 4, 2)
-
+            
+        rotated_batch.update({
+            'point': batch['point'],
+            'style_idx': batch['style_idx']
+        })
+        
         return rotated_batch

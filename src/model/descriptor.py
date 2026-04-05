@@ -13,7 +13,6 @@ import pytorch_lightning as pl
 from .networks import resnet18_3d_encoder
 from .losses import InfoNCELoss, CurriculumTripletLoss
 from .matcher import KNNMatcher
-from src.data.transforms import BatchRotate3D
 import logging
 
 logger = logging.getLogger(__name__)
@@ -127,9 +126,6 @@ class Descriptor(pl.LightningModule):
         # Store evaluation parameters
         self.max_distance = max_distance
         
-        # Initialize batch rotation augmentation (applied on GPU in training_step)
-        self.batch_rotate = BatchRotate3D(max_angle=45.0)
-
         # Initialize test outputs storage
         self.test_step_outputs: List[Dict[str, Any]] = []
     
@@ -181,20 +177,15 @@ class Descriptor(pl.LightningModule):
         """
         dataset = self.trainer.datamodule.train_dataset
         
-        # Update maximum rotation angle (curriculum learning)
+        # Update maximum rotation angle
         dataset.update_angle(self.current_epoch)
-        self.batch_rotate.max_angle = dataset.current_max_angle
-
-        # Pre-compute one rotation for the entire epoch (simulates volume rotation)
-        self._epoch_angles = self.batch_rotate._generate_random_angles() if dataset.augment else None
-
+        
         # Choose random style for this epoch
         new_style = torch.randint(0, dataset.num_styles, (1,)).item()
         dataset.style_idx = new_style
-
-        # Resample points (every 5 epochs to reduce overhead)
-        if self.current_epoch % 5 == 0:
-            dataset.resample_points()
+        
+        # Resample points
+        dataset.resample_points()
 
     def training_step(self, batch: Dict[str, torch.Tensor], batch_idx: int) -> torch.Tensor:
         """
@@ -207,22 +198,8 @@ class Descriptor(pl.LightningModule):
         Returns:
             Loss tensor for this batch
         """
-        # Apply rotation augmentation on GPU (same angles for entire epoch)
-        if self.training and self._epoch_angles is not None:
-            affine = self.batch_rotate._get_affine_matrix(self._epoch_angles)
-            rotated = dict(batch)
-            for key in ['mr', 'synth_us']:
-                if key not in batch:
-                    continue
-                x = batch[key].permute(0, 1, 4, 2, 3)  # [B, 1, D, H, W]
-                affine_batch = affine.to(x.device).unsqueeze(0).expand(x.size(0), -1, -1)
-                grid = torch.nn.functional.affine_grid(affine_batch, x.size(), align_corners=False)
-                rot = torch.nn.functional.grid_sample(x, grid, mode='bilinear', padding_mode='zeros', align_corners=False)
-                rotated[key] = rot.permute(0, 1, 3, 4, 2)
-            batch = rotated
-
         # Forward pass
-        anchor_output = self(batch['mr'])
+        anchor_output = self(batch['mr'])         
         positive_output = self(batch['synth_us'])
         
         # Update loss function with current epoch for curriculum learning
