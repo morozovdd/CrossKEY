@@ -183,7 +183,7 @@ class CurriculumTripletLoss(BaseLoss):
         
         if coordinates is not None:
             # Incorporate spatial information for better negative selection
-            spatial_weights = self._compute_spatial_weights(coordinates)
+            spatial_weights = self._compute_spatial_weights(coordinates.to(anchor.device))
             
             # Combine embedding distances with spatial weights
             # Early training: prefer spatially distant negatives

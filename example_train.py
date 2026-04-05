@@ -1,8 +1,14 @@
 import argparse
 import logging
+import os
+import platform
 import subprocess
 import sys
 from pathlib import Path
+
+# MPS (Apple Silicon) does not support 3D pooling ops; enable CPU fallback
+if platform.system() == 'Darwin':
+    os.environ.setdefault('PYTORCH_ENABLE_MPS_FALLBACK', '1')
 
 import torch
 import yaml
