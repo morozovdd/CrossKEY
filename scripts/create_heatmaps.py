@@ -129,6 +129,8 @@ class HeatmapProcessor:
         """Get volume shape from the MR file and store reference path."""
         # Try MR folder first
         mr_files = list((self.data_dir / "mr").glob("*.nii.gz"))
+        if not mr_files:
+            raise FileNotFoundError(f"No MR files found in {self.data_dir / 'mr'}. Place .nii.gz files there first.")
         self.reference_nifti_path = str(mr_files[0])  # Store for later use
         volume = load_nifti(self.reference_nifti_path)
         return volume.shape

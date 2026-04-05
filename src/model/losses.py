@@ -129,7 +129,7 @@ class CurriculumTripletLoss(BaseLoss):
         spatial_dist = torch.clamp(spatial_dist / self.max_spatial_dist, 0, 1)
         
         # Convert to weights: points further apart should be preferred as negatives
-        weights = spatial_dist / spatial_dist.max()
+        weights = spatial_dist / (spatial_dist.max() + 1e-8)
         
         # Mask out self-pairs
         mask = torch.eye(len(coordinates), device=coordinates.device)

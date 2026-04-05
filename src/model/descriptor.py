@@ -203,7 +203,8 @@ class Descriptor(pl.LightningModule):
         self.loss_fn.update_epoch(self.current_epoch)
         
         # Calculate loss
-        loss, components = self.loss_fn(anchor_output, positive_output)
+        coordinates = batch.get('point', None)
+        loss, components = self.loss_fn(anchor_output, positive_output, coordinates=coordinates)
         
         # Log metrics
         self.log('train/loss', loss, on_step=False, on_epoch=True, prog_bar=True)
