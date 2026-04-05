@@ -427,42 +427,9 @@ class DescriptorTrainingDataset(BaseDescriptorDataset):
             self.current_angles = None
     
     def _process_mr_patch(self, patch: torch.Tensor) -> torch.Tensor:
-        """
-        Process MR patch with optional rotation, cropping, and normalization.
-        
-        Args:
-            patch: Raw MR patch [1, H, W, D]
-            
-        Returns:
-            Processed patch [1, patch_size[0], patch_size[1], patch_size[2]]
-        """
-        if self.augment and self.current_angles is not None:
-            # Apply rotation using precomputed angles
-            affine = self.rotate._get_affine_matrix(self.current_angles)
-            
-            # Reshape for grid_sample: [1, 1, D, H, W]
-            x = patch.unsqueeze(0).permute(0, 1, 4, 2, 3)
-            
-            # Generate sampling grid and apply transformation
-            grid = F.affine_grid(
-                affine.unsqueeze(0),
-                x.size(),
-                align_corners=False
-            )
-            
-            # Apply transformation
-            patch = F.grid_sample(
-                x,
-                grid,
-                mode='bilinear',
-                padding_mode='zeros',
-                align_corners=False
-            ).squeeze(0).permute(0, 2, 3, 1)  # Back to [1, H, W, D]
-        
-        # Apply cropping and normalization
+        """Process MR patch with cropping and normalization."""
         patch = self.crop(patch)
-        patch = self.normalize(patch)
-        return patch
+        return self.normalize(patch)
     
     def _process_us_patch(self, patch: torch.Tensor) -> torch.Tensor:
         """
@@ -491,18 +458,15 @@ class DescriptorTrainingDataset(BaseDescriptorDataset):
             
         Returns:
             Dictionary containing:
-                - mr: Processed MR patch (with rotation if augmented)
+                - mr: Processed MR patch
                 - synth_us: Processed synthetic US patch
                 - point: Point coordinates [3]
                 - style_idx: Style index used
         """
         point = self.points[idx]
         
-        # Determine patch extraction size (larger if augmenting)
-        enlarge_factor = 1.5 if self.augment else 1.0
-        
-        # Extract patches
-        mr_patch = self._extract_patch(self.mr, point, enlarge_factor)
+        # Extract patches (rotation is now done on GPU in training_step)
+        mr_patch = self._extract_patch(self.mr, point)
         synth_patch = self._extract_patch(self.synth_us[self.style_idx], point)
         
         # Process patches
