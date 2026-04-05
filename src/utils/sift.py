@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import nibabel as nib
 import tempfile
+from pathlib import Path
 from tqdm import tqdm
 
 
@@ -55,7 +56,7 @@ class SIFT3D():
 
     """
     def __init__(self, peak_threshold=0.1, corner_threshold=0.4, num_kp_levels=3, sigma_n=1.15, sigma0=1.6):
-        self.executable = './external_libs/SIFT3D/build/bin/kpSift3D'
+        self.executable = str(Path(__file__).resolve().parent.parent.parent / 'external_libs' / 'SIFT3D' / 'build' / 'bin' / 'kpSift3D')
         self.peak_threshold = peak_threshold
         self.corner_threshold = corner_threshold
         self.num_kp_levels = num_kp_levels
@@ -120,16 +121,15 @@ class SIFT3D():
         file_name = os.path.join(output_directory, f"{base_name}_keys.nii.gz")
 
         # Run the SIFT3D command on the processed image
-        command = ['sudo',
-                    self.executable, 
+        command = [self.executable,
                 #    '--keys', keys_output,
-                   '--desc', desc_output, 
+                   '--desc', desc_output,
                 #    '--draw', file_name,
-                   '--peak_thresh', str(self.peak_threshold), 
-                   '--corner_thresh', str(self.corner_threshold), 
+                   '--peak_thresh', str(self.peak_threshold),
+                   '--corner_thresh', str(self.corner_threshold),
                    '--num_kp_levels', str(self.num_kp_levels),
-                   '--sigma_n', str(self.sigma_n), 
-                   '--sigma0', str(self.sigma0), 
+                   '--sigma_n', str(self.sigma_n),
+                   '--sigma0', str(self.sigma0),
                    processed_image_file]
         
         result = subprocess.run(command, capture_output=True, text=True)
@@ -155,6 +155,7 @@ class SIFT3D():
     def count_keypoints(self, keypoints_file):
         with open(keypoints_file, 'r') as f:
             csv_reader = csv.reader(f)
+            next(csv_reader, None)  # Skip header row
             return sum(1 for row in csv_reader)
 
     def process_images(self, image_files, output_directory, preprocess=True):
@@ -190,12 +191,11 @@ class SIFT3D():
 
 def get_sift_descriptors(image_file, keypoints_file, desc_output):
     
-    executable = './external_libs/SIFT3D/build/bin/featSift3D'
-    command = ['sudo',
-                executable,
-                image_file,
-                keypoints_file, 
-                desc_output]
+    executable = str(Path(__file__).resolve().parent.parent.parent / 'external_libs' / 'SIFT3D' / 'build' / 'bin' / 'featSift3D')
+    command = [executable,
+               image_file,
+               keypoints_file,
+               desc_output]
     subprocess.run(command)
     
     # Unzip the descriptors
