@@ -60,9 +60,10 @@ Intraoperative registration of real-time ultrasound (iUS) to preoperative Magnet
 
 1. **Clone the repository:**
 ```bash
-# For faster cloning (recommended):
-git clone --depth 1 https://github.com/morozovdd/CrossKEY.git
+# Fast clone (skips large data files, ~2s):
+GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 https://github.com/morozovdd/CrossKEY.git
 cd CrossKEY
+git lfs pull  # Download data files separately
 ```
 
 2. **Run the setup script:**
