@@ -168,34 +168,48 @@ class SIFT3D():
             next(csv_reader, None)  # Skip header row
             return sum(1 for row in csv_reader)
 
-    def process_images(self, image_files, output_directory, preprocess=True):
+    def process_images(self, image_files, output_directory, preprocess=True, max_workers=1):
         """
         Process multiple images with SIFT3D.
-        
+
         Args:
             image_files (list): List of image file paths
             output_directory (str): Directory to save outputs
             preprocess (bool): Whether to apply IJK to RAS matrix preprocessing
+            max_workers (int): Number of parallel workers (default: 1)
         """
         os.makedirs(output_directory, exist_ok=True)
         total_points = 0
         failed_files = 0
-        
-        # Use tqdm for progress bar
-        for image_file in tqdm(image_files, desc="Processing images", unit="file"):
-            points, filename = self.run_sift3d(image_file, output_directory, preprocess=preprocess)
-            if filename:
-                total_points += points
-            else:
-                failed_files += 1
-        
+
+        if max_workers > 1:
+            from concurrent.futures import ThreadPoolExecutor, as_completed
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                futures = {
+                    executor.submit(self.run_sift3d, f, output_directory, preprocess): f
+                    for f in image_files
+                }
+                for future in tqdm(as_completed(futures), total=len(image_files), desc="Processing images", unit="file"):
+                    points, filename = future.result()
+                    if filename:
+                        total_points += points
+                    else:
+                        failed_files += 1
+        else:
+            for image_file in tqdm(image_files, desc="Processing images", unit="file"):
+                points, filename = self.run_sift3d(image_file, output_directory, preprocess=preprocess)
+                if filename:
+                    total_points += points
+                else:
+                    failed_files += 1
+
         # Summary
         success_count = len(image_files) - failed_files
         logger.info("Processed %d/%d files successfully", success_count, len(image_files))
         logger.info("Total keypoints detected: %d", total_points)
         if failed_files > 0:
             logger.warning("Failed files: %d", failed_files)
-        
+
         return total_points
 
 

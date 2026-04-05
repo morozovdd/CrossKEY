@@ -16,6 +16,8 @@ def parse_args():
                         help="Input data directory containing mr/ and synthetic_us/ subdirs")
     parser.add_argument("--output-dir", type=str, default="./data/sift_output",
                         help="Output directory for SIFT descriptors")
+    parser.add_argument("--workers", type=int, default=2,
+                        help="Number of parallel workers")
     parser.add_argument("--verbose", action="store_true",
                         help="Enable debug logging")
     return parser.parse_args()
@@ -50,14 +52,14 @@ def main():
         logger.info("Processing %d MR files...", len(mr_files))
         mr_output = os.path.join(args.output_dir, "mr")
         os.makedirs(mr_output, exist_ok=True)
-        sift.process_images(mr_files, mr_output, preprocess=True)
+        sift.process_images(mr_files, mr_output, preprocess=True, max_workers=args.workers)
 
     synth_files = get_nifti_files(os.path.join(args.input_dir, "synthetic_us"))
     if synth_files:
         logger.info("Processing %d synthetic US files...", len(synth_files))
         synth_output = os.path.join(args.output_dir, "synthetic_us")
         os.makedirs(synth_output, exist_ok=True)
-        sift.process_images(synth_files, synth_output, preprocess=True)
+        sift.process_images(synth_files, synth_output, preprocess=True, max_workers=args.workers)
 
     logger.info("SIFT processing completed. Results: %s", args.output_dir)
 
