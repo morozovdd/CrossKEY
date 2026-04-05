@@ -173,12 +173,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you find this work useful for your research, please consider citing:
 
 ```bibtex
-@article{morozov2026crosskey,
-  title={A 3D Cross-modal Keypoint Descriptor for MR-US Matching and Registration},
+@ARTICLE{11474556,
   author={Morozov, Daniil and Dorent, Reuben and Haouchine, Nazim},
   journal={IEEE Transactions on Medical Imaging},
+  title={A 3D Cross-modal Keypoint Descriptor for MR-US Matching and Registration},
   year={2026},
-  doi={10.1109/TMI.2026.3680352},
-  url={https://ieeexplore.ieee.org/document/11474556}
-}
+  volume={},
+  number={},
+  pages={1-1},
+  keywords={Feeds;Speckle;Filtering;Filters;Optical noise;Circuits and systems;Communication systems;Digital images;Protocols;Spatial diversity;Cross-modality;3D Keypoint Descriptor;MRI;Ultrasound;Matching and Registration},
+  doi={10.1109/TMI.2026.3680352}}
 ```
