@@ -163,16 +163,13 @@ class CurriculumTripletLoss(BaseLoss):
                     - mining_difficulty: Current mining difficulty [0, 1]
         """
         batch_size = anchor.size(0)
-        
-        # Normalize embeddings for consistent distance computation
-        anchor_norm = F.normalize(anchor, p=2, dim=1)
-        positive_norm = F.normalize(positive, p=2, dim=1)
-        
+
+        # Embeddings are already L2-normalized by the network
         # Compute positive distances (L2 squared)
-        pos_dist = torch.sum((anchor_norm - positive_norm) ** 2, dim=1)
-        
+        pos_dist = torch.sum((anchor - positive) ** 2, dim=1)
+
         # Compute all pairwise distances for potential negatives
-        neg_dist_matrix = torch.cdist(anchor_norm, positive_norm, p=2)
+        neg_dist_matrix = torch.cdist(anchor, positive, p=2)
         
         # Mask out positive pairs (diagonal elements)
         mask = torch.eye(batch_size, device=anchor.device)

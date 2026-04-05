@@ -28,7 +28,7 @@ trainer:
 # Data parameters
 data:
   batch_size: 256                # Batch size
-  num_workers: 4                 # Number of data loading workers
+  num_workers: 0                 # Number of data loading workers (0 = main process, fastest for in-memory data)
   patch_size: 32                 # Size of extracted patches
   num_samples: 1024              # Number of training samples per epoch
   grid_spacing: 8                # Grid spacing for inference
