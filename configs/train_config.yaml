@@ -24,7 +24,6 @@ trainer:
   accelerator: "auto"            # Accelerator type ('cpu', 'gpu', 'auto')
   devices: "auto"                # Number of devices
   log_every_n_steps: 50          # Log every N steps
-  # gradient_clip_val: 1.0         # Gradient clipping value
 
 # Data parameters
 data:
@@ -54,22 +53,3 @@ logger:
   name: "descriptor_experiment"  # Experiment name
   project: "crossmodal-descriptor"  # Project name (for wandb)
   tags: ["3d", "descriptor"]  # Tags for experiment
-
-# # Checkpoint configuration (using Lightning's default)
-# checkpoint:
-#   dirpath: "checkpoints/"        # Directory to save checkpoints
-#   filename: "{epoch:03d}-{train_loss:.4f}"  # Checkpoint filename pattern
-#   monitor: "train/loss"          # Metric to monitor for checkpointing
-#   mode: "min"                    # Mode for monitoring ('min' for loss)
-#   save_top_k: 3                  # Number of best checkpoints to keep
-#   save_last: true                # Save the last checkpoint
-#   every_n_epochs: 10             # Save checkpoint every N epochs
-#   save_weights_only: false       # Save full checkpoint (not just weights)
-
-# # Early stopping configuration
-# early_stopping:
-#   enabled: true                  # Enable early stopping based on training loss
-#   monitor: "train/loss"          # Metric to monitor
-#   patience: 50                   # Number of epochs to wait for improvement
-#   mode: "min"                    # Mode for monitoring ('min' for loss)
-#   min_delta: 0.0001              # Minimum change to qualify as improvement
