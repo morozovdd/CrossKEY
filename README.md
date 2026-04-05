@@ -1,16 +1,16 @@
 <p align="center">
-  <h1 align="center">🔑 <ins>CrossKEY</ins><br>A framework for learning 3D Cross-modal Keypoint Descriptor for MR-US Matching and Registration</h1>
+  <h1 align="center"><ins>CrossKEY</ins><br>A 3D Cross-modal Keypoint Descriptor for MR-US Matching and Registration</h1>
   <p align="center">
     <a href="https://scholar.google.com/citations?hl=en&user=XO_2QcAAAAAJ">Daniil Morozov</a><sup>1,2</sup>
-    ·
+    &middot;
     <a href="https://scholar.google.com/citations?user=xdECLMkAAAAJ&hl=fr">Reuben Dorent</a><sup>3,4</sup>
-    ·
+    &middot;
     <a href="https://scholar.google.com/citations?user=PjpzomsAAAAJ&hl=fr&oi=ao">Nazim Haouchine</a><sup>2</sup>
   </p>
   <p align="center">
-    <sup>1</sup> Technical University of Munich (TUM), &nbsp;<sup>2</sup> Harvard Medical School, &nbsp;
-    <sup>3</sup> Inria Saclay, &nbsp;
-    <sup>4</sup> Sorbonne Université, Paris Brain Institute (ICM)
+    <sup>1</sup> Technical University of Munich, &nbsp;<sup>2</sup> Harvard Medical School, Brigham and Women's Hospital, &nbsp;
+    <sup>3</sup> Inria, &nbsp;
+    <sup>4</sup> Sorbonne Universit&eacute;, Paris Brain Institute
   </p>
 </p>
 
@@ -22,155 +22,112 @@
 
 </div>
 
-<div align="center">
-
 <p align="center">
-    <img src="assets/main.gif" alt="CrossKEY Demo" width="80%">
-    <br>
-    <em>CrossKEY enables robust 3D keypoint matching between MRI and iUS, achieving state-of-the-art performance both in image matching and registration tasks</em>
+  <img src="assets/main.gif" alt="CrossKEY Demo" width="80%">
 </p>
 
-</div>
+## Abstract
 
-## 📋 TODO
-
-- [X] **Essential Scripts**: Add training and testing scripts with test data example
-- [ ] **Interactive Demo**: Create HuggingFace Spaces demo ([#1](https://github.com/morozovdd/CrossKEY/issues/1))
-- [ ] **Visualization Functions**: Add utilities for keypoint and matching visualization
-
-## 📋 Abstract
-
-Intraoperative registration of real-time ultrasound (iUS) to preoperative Magnetic Resonance Imaging (MRI) remains an unsolved problem due to severe modality-specific differences in appearance, resolution, and field-of-view. To address this, we propose a novel 3D cross-modal keypoint descriptor for MRI–iUS matching and registration. Our approach employs a **patient-specific matching-by-synthesis approach**, generating synthetic iUS volumes from preoperative MRI. This enables supervised contrastive training to learn a shared descriptor space. A **probabilistic keypoint detection strategy** is then employed to identify anatomically salient and modality-consistent locations. During training, a curriculum-based triplet loss with dynamic hard negative mining is used to learn descriptors that are i) robust to iUS artifacts such as speckle noise and limited coverage, and ii) rotation-invariant. At inference, the method detects keypoints in MR and real iUS images and identifies sparse matches, which are then used to perform rigid registration. Our approach is evaluated using 3D MRI-iUS pairs from the ReMIND dataset. Experiments show that our approach outperforms state-of-the-art keypoint matching methods across 11 patients, with an average precision of **69.8%**. For image registration, our method achieves a competitive mean Target Registration Error of **2.39 mm** on the ReMIND2Reg benchmark.
+Intraoperative registration of real-time ultrasound (iUS) to preoperative Magnetic Resonance Imaging (MRI) remains an unsolved problem due to severe modality-specific differences in appearance, resolution, and field-of-view. To address this, we propose a novel 3D cross-modal keypoint descriptor for MRI-iUS matching and registration. Our approach employs a **patient-specific matching-by-synthesis approach**, generating synthetic iUS volumes from preoperative MRI. This enables supervised contrastive training to learn a shared descriptor space. A **probabilistic keypoint detection strategy** is then employed to identify anatomically salient and modality-consistent locations. During training, a curriculum-based triplet loss with dynamic hard negative mining is used to learn descriptors that are i) robust to iUS artifacts such as speckle noise and limited coverage, and ii) rotation-invariant. At inference, the method detects keypoints in MR and real iUS images and identifies sparse matches, which are then used to perform rigid registration. Our approach is evaluated using 3D MRI-iUS pairs from the ReMIND dataset. Experiments show that our approach outperforms state-of-the-art keypoint matching methods across 11 patients, with an average precision of **69.8%**. For image registration, our method achieves a competitive mean Target Registration Error of **2.39 mm** on the ReMIND2Reg benchmark.
 
 <p align="center">
-  <img src="assets/Overview.png" alt="Method Overview" width="100%"> 
-</p>
-<p align="center">
-  <em>Overview of our CrossKEY framework</em>
+  <img src="assets/Overview.png" alt="Method Overview" width="100%">
 </p>
 
-## 🚀 Quick Start
+## Getting Started
 
 ### Prerequisites
-- Python ≥ 3.12
+
+- Python >= 3.12
 - [uv](https://docs.astral.sh/uv/) for dependency management
-- Ubuntu/Linux (for SIFT3D compilation)
+- Linux (required for SIFT3D compilation; see `setup.sh` for details)
 
 ### Installation
 
-1. **Clone the repository:**
 ```bash
-# Fast clone (skips large data files, ~2s):
+# Clone (fast, skips large data files):
 GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 https://github.com/morozovdd/CrossKEY.git
 cd CrossKEY
-git lfs pull  # Download data files separately
-```
+git lfs pull
 
-2. **Run the setup script:**
-```bash
+# Install dependencies and build SIFT3D:
 ./setup.sh
-```
-
-This will:
-- Set up Python environment with uv
-- Install dependencies
-- Compile external libraries (SIFT3D)
-- Create necessary directories
-
-3. **Start training:**
-```bash
 source .venv/bin/activate
-python example_train.py
 ```
-
-The training script automatically generates required preprocessing data (SIFT descriptors and heatmaps) on first run.
-
-## 🔧 Usage
 
 ### Training
 
 ```bash
-python example_train.py
+python example_train.py [--config configs/train_config.yaml] [--data-dir data]
 ```
 
-The training script will:
-1. Automatically generate SIFT descriptors if missing
-2. Create keypoint heatmaps if missing  
-3. Train the CrossKEY descriptor model
-4. Save checkpoints to `logs/`
+On first run, SIFT descriptors and keypoint heatmaps are generated automatically. Checkpoints are saved to `logs/`.
 
 ### Testing
 
 ```bash
-python example_test.py
+python example_test.py --checkpoint path/to/checkpoint.ckpt [--data-dir data]
 ```
 
-Requires a trained model checkpoint. Update the checkpoint path in `configs/test_config.yaml`:
-```yaml
-model:
-  checkpoint_path: "path/to/your/checkpoint.ckpt"
+## Data
+
+### Included Example
+
+The repository includes one case (Case059) for testing:
+
+```
+data/img/
+├── mr/              # T2-weighted brain MRI (.nii.gz)
+├── us/              # Real intraoperative ultrasound (.nii.gz)
+└── synthetic_us/    # Synthetic US generated from MR (.nii.gz)
 ```
 
-### Configuration
+### Using Your Own Data
 
-Modify training parameters in `configs/train_config.yaml`:
-- Model architecture settings
-- Loss function parameters  
-- Training hyperparameters
-- Data augmentation options
+Place your NIfTI files (`.nii.gz`) in the same directory structure above. Requirements:
 
-## 📊 Data
+- **MR**: 3D brain MRI (T1/T2 weighted)
+- **Synthetic US**: Generated from MR using an ultrasound synthesis pipeline (required for training)
+- **Real US**: 3D intraoperative ultrasound volume (required for testing only)
 
-### Included Test Data
-The repository includes test data from Case059:
-- **MR images**: T2-weighted brain MRI
-- **US images**: Real intraoperative ultrasound
-- **Synthetic US**: Generated from MR using synthesis pipeline
+SIFT descriptors and heatmaps are generated automatically on first training run.
 
-### Generated Outputs (automatically created)
-- **SIFT descriptors**: 3D keypoint features for training
-- **Heatmaps**: Probabilistic keypoint detection maps
+## Configuration
 
-### Training with Your Own Data
+Training and evaluation are configured via YAML files in `configs/`:
 
-To train CrossKEY with your own medical imaging data:
+- `train_config.yaml` -- model architecture, loss, optimizer, data augmentation, training schedule
+- `test_config.yaml` -- checkpoint path, evaluation thresholds
 
-1. **Prepare your data structure:**
-   ```
-   data/img/
-   ├── mr/                    # Place your MR images here (.nii.gz)
-   ├── us/                    # Place real US images here (.nii.gz)
-   └── synthetic_us/          # Place synthetic US images here (.nii.gz)
-   ```
+All parameters can also be overridden via command-line arguments. Run `python example_train.py --help` for details.
 
-2. **Data requirements:**
-   - **MR images**: 3D T1/T2 weighted brain MRI in NIfTI format (.nii.gz)
-   - **Synthetic US**: Generated from MR using US image synthesizer (required for training)
-   - **Real US**: Optional for testing; 3D intraoperative ultrasound volume
+## Project Structure
 
-3. **Start training:**
-   ```bash
-   python example_train.py
-   ```
-   The system will automatically generate SIFT descriptors and heatmaps for your data.
+```
+CrossKEY/
+├── src/
+│   ├── model/
+│   │   ├── descriptor.py     # Lightning module for descriptor learning
+│   │   ├── networks.py       # 3D ResNet encoder
+│   │   ├── losses.py         # Triplet, InfoNCE, BCE losses
+│   │   └── matcher.py        # KNN matching and evaluation
+│   ├── data/
+│   │   ├── datamodule.py     # Lightning DataModule
+│   │   ├── dataset.py        # Training and inference datasets
+│   │   └── transforms.py     # 3D rotation, crop, normalization
+│   └── utils/
+│       ├── sift.py           # SIFT3D wrapper
+│       └── utils.py          # NIfTI I/O utilities
+├── scripts/
+│   ├── run_sift.py           # SIFT3D keypoint extraction
+│   └── create_heatmaps.py    # Probabilistic keypoint heatmaps
+├── configs/                   # YAML configuration files
+├── data/img/                  # Example data (Case059)
+├── example_train.py           # Training entry point
+└── example_test.py            # Evaluation entry point
+```
 
-**Note**: For optimal results, ensure synthetic US images are generated using a realistic ultrasound synthesis pipeline that preserves anatomical correspondences with the source MR images.
-
-## 🎯 Key Features
-
-- **Automatic preprocessing**: SIFT extraction and heatmap generation
-- **Cross-modal learning**: MR-US descriptor matching
-- **Curriculum training**: Progressive hard negative mining
-- **Rotation invariance**: Robust to orientation changes
-- **Patient-specific**: Synthesis-based training approach
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📖 Citation
-
-If you find this work useful for your research, please consider citing:
+## Citation
 
 ```bibtex
 @ARTICLE{11474556,
@@ -184,3 +141,7 @@ If you find this work useful for your research, please consider citing:
   keywords={Feeds;Speckle;Filtering;Filters;Optical noise;Circuits and systems;Communication systems;Digital images;Protocols;Spatial diversity;Cross-modality;3D Keypoint Descriptor;MRI;Ultrasound;Matching and Registration},
   doi={10.1109/TMI.2026.3680352}}
 ```
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
