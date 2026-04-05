@@ -1,7 +1,7 @@
 <p align="center">
   <h1 align="center">🔑 <ins>CrossKEY</ins><br>A framework for learning 3D Cross-modal Keypoint Descriptor for MR-US Matching and Registration</h1>
   <p align="center">
-    Daniil Morozov<sup>1,2</sup>
+    <a href="https://scholar.google.com/citations?hl=en&user=XO_2QcAAAAAJ">Daniil Morozov</a><sup>1,2</sup>
     ·
     <a href="https://scholar.google.com/citations?user=xdECLMkAAAAJ&hl=fr">Reuben Dorent</a><sup>3,4</sup>
     ·
