@@ -413,8 +413,9 @@ class DescriptorDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=self.num_workers,
-            pin_memory=True,
-            drop_last=True
+            pin_memory=self.num_workers > 0,
+            drop_last=True,
+            persistent_workers=self.num_workers > 0,
         )
     
     def test_dataloader(self) -> DataLoader:
