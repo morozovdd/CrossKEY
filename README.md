@@ -17,6 +17,7 @@
 <div align="center">
 
 <a href="https://arxiv.org/abs/2507.18551"><img src="https://img.shields.io/badge/arXiv-2507.18551-b31b1b" alt='arxiv'></a>
+<a href="https://ieeexplore.ieee.org/document/11474556"><img src="https://img.shields.io/badge/IEEE-TMI-blue" alt='IEEE TMI'></a>
 <a href="https://www.cancerimagingarchive.net/collection/remind/"><img src="https://img.shields.io/badge/Dataset-ReMIND-blue" alt='Dataset'></a>
 <a href="#license"><img src="https://img.shields.io/badge/License-MIT-green" alt='License'></a>
 
@@ -35,7 +36,7 @@
 ## 📋 TODO
 
 - [X] **Essential Scripts**: Add training and testing scripts with test data example
-- [ ] **Interactive Demo**: Create Colab notebook for easy experimentation
+- [ ] **Interactive Demo**: Create HuggingFace Spaces demo ([#1](https://github.com/morozovdd/CrossKEY/issues/1))
 - [ ] **Visualization Functions**: Add utilities for keypoint and matching visualization
 
 ## 📋 Abstract
@@ -53,14 +54,15 @@ Intraoperative registration of real-time ultrasound (iUS) to preoperative Magnet
 
 ### Prerequisites
 - Python ≥ 3.12
-- Poetry for dependency management
+- [uv](https://docs.astral.sh/uv/) for dependency management
 - Ubuntu/Linux (for SIFT3D compilation)
 
 ### Installation
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/morozovdd/CrossKEY.git
+# For faster cloning (recommended):
+git clone --depth 1 https://github.com/morozovdd/CrossKEY.git
 cd CrossKEY
 ```
 
@@ -77,7 +79,7 @@ This will:
 
 3. **Start training:**
 ```bash
-poetry shell
+source .venv/bin/activate
 python example_train.py
 ```
 
@@ -88,7 +90,7 @@ The training script automatically generates required preprocessing data (SIFT de
 ### Training
 
 ```bash
-poetry run python example_train.py
+python example_train.py
 ```
 
 The training script will:
@@ -100,7 +102,7 @@ The training script will:
 ### Testing
 
 ```bash
-poetry run python example_test.py
+python example_test.py
 ```
 
 Requires a trained model checkpoint. Update the checkpoint path in `configs/test_config.yaml`:
@@ -148,7 +150,7 @@ To train CrossKEY with your own medical imaging data:
 
 3. **Start training:**
    ```bash
-   poetry run python example_train.py
+   python example_train.py
    ```
    The system will automatically generate SIFT descriptors and heatmaps for your data.
 
@@ -171,13 +173,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you find this work useful for your research, please consider citing:
 
 ```bibtex
-@article{morozov20253dcrossmodalkeypointdescriptor,
-      title={A 3D Cross-modal Keypoint Descriptor for MR-US Matching and Registration}, 
-      author={Daniil Morozov and Reuben Dorent and Nazim Haouchine},
-      year={2025},
-      eprint={2507.18551},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2507.18551}, 
+@article{morozov2026crosskey,
+  title={A 3D Cross-modal Keypoint Descriptor for MR-US Matching and Registration},
+  author={Morozov, Daniil and Dorent, Reuben and Haouchine, Nazim},
+  journal={IEEE Transactions on Medical Imaging},
+  year={2026},
+  doi={10.1109/TMI.2026.3680352},
+  url={https://ieeexplore.ieee.org/document/11474556}
 }
 ```
