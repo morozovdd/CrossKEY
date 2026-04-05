@@ -7,6 +7,9 @@ from tqdm import tqdm
 import sys
 sys.path.append(str(Path(__file__).resolve().parent.parent))  # Ensure src is in path
 from src.utils.utils import load_nifti, save_nifti
+import logging
+
+logger = logging.getLogger("crosskey.heatmap")
 
 class HeatmapProcessor:
     def __init__(self, data_dir: str, output_dir: str):
@@ -61,7 +64,7 @@ class HeatmapProcessor:
                 x, y, z = point
                 frequency_map[y, x, z] += 1
         
-        print(f"  ✅ {len(sift_files)} files processed, {total_points} keypoints added")
+        logger.info("  %d files processed, %d keypoints added", len(sift_files), total_points)
         
         # Normalize and smooth the frequency map
         freq_normalized = self.normalize_map(frequency_map)
@@ -138,40 +141,51 @@ class HeatmapProcessor:
     
     def process_heatmaps(self, sigma: float = 2.0):
         """Process heatmaps for both MR and synthetic US modalities."""
-        print("🔥 Creating heatmaps...")
-        
-        # Get volume shape from reference image
+        logger.info("Creating heatmaps...")
+
         volume_shape = self.get_reference_volume_shape()
-        print(f"📐 Reference volume shape: {volume_shape}")
-        
-        # Create heatmaps for each modality
-        print("\n🔍 Processing MR modality...")
+        logger.info("Reference volume shape: %s", volume_shape)
+
+        logger.info("Processing MR modality...")
         mr_heatmap = self.create_frequency_heatmap(volume_shape, 'mr', sigma)
-        
-        print("\n🔍 Processing synthetic US modality...")
+
+        logger.info("Processing synthetic US modality...")
         synthetic_us_heatmap = self.create_frequency_heatmap(volume_shape, 'synthetic_us', sigma)
-        
-        # Save individual heatmaps in NIfTI format
+
         save_nifti(mr_heatmap, self.output_dir / 'mr_heatmap.nii.gz', self.reference_nifti_path)
         save_nifti(synthetic_us_heatmap, self.output_dir / 'synthetic_us_heatmap.nii.gz', self.reference_nifti_path)
-        
-        # Create combined heatmap
+
         if mr_heatmap.max() > 0 and synthetic_us_heatmap.max() > 0:
             combined_heatmap = self.combine_heatmaps(mr_heatmap, synthetic_us_heatmap)
             save_nifti(combined_heatmap, self.output_dir / 'main_heatmap.nii.gz', self.reference_nifti_path)
         else:
-            print("⚠️  One or both heatmaps are empty, skipping combined heatmap")
-        
-        print(f"✅ All heatmaps saved to: {self.output_dir}")
+            logger.warning("One or both heatmaps are empty, skipping combined heatmap")
+
+        logger.info("All heatmaps saved to: %s", self.output_dir)
 
 def main():
-    """Main function to process heatmaps."""
-    
-    data_dir = "data/img"  # Contains mr/, synthetic_us/, us/ folders
-    output_dir = "data/heatmap" 
-    
-    processor = HeatmapProcessor(data_dir, output_dir)
-    processor.process_heatmaps(sigma=2.0)
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Generate keypoint heatmaps from SIFT descriptors")
+    parser.add_argument("--data-dir", type=str, default="data/img",
+                        help="Input data directory containing mr/ and synthetic_us/")
+    parser.add_argument("--output-dir", type=str, default="data/heatmap",
+                        help="Output directory for heatmaps")
+    parser.add_argument("--sigma", type=float, default=2.0,
+                        help="Gaussian smoothing sigma")
+    parser.add_argument("--verbose", action="store_true",
+                        help="Enable debug logging")
+    args = parser.parse_args()
+
+    logging.basicConfig(
+        level=logging.DEBUG if args.verbose else logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        datefmt="%H:%M:%S",
+    )
+
+    processor = HeatmapProcessor(args.data_dir, args.output_dir)
+    processor.process_heatmaps(sigma=args.sigma)
+
 
 if __name__ == "__main__":
     main()
