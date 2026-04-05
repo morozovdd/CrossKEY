@@ -13,6 +13,9 @@ import pytorch_lightning as pl
 from .networks import resnet18_3d_encoder
 from .losses import InfoNCELoss, CurriculumTripletLoss
 from .matcher import KNNMatcher
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Descriptor(pl.LightningModule):
     """
@@ -67,7 +70,7 @@ class Descriptor(pl.LightningModule):
         margin: float = 1.0,
         temperature: float = 0.1,
         warmup_epochs: int = 200,
-        spatial_weight: float = 0.3,
+        spatial_weight: float = 0.5,
         max_spatial_dist: float = 48.0,
 
         # Optimizer parameters
@@ -271,7 +274,7 @@ class Descriptor(pl.LightningModule):
         us_patches = all_patches[us_mask]
         
         if len(mr_descriptors) == 0 or len(us_descriptors) == 0:
-            print("No MR or US descriptors found for matching")
+            logger.warning("No MR or US descriptors found for matching")
             return
         
         # Perform matching and evaluation
@@ -288,4 +291,4 @@ class Descriptor(pl.LightningModule):
             self.log_dict(test_metrics, on_step=False, on_epoch=True)
             
         except Exception as e:
-            print(f"Error in test matching: {e}")
+            logger.error("Error in test matching: %s", e)

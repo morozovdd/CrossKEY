@@ -7,6 +7,9 @@ import nibabel as nib
 import tempfile
 from pathlib import Path
 from tqdm import tqdm
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SIFT3D():
@@ -181,10 +184,10 @@ class SIFT3D():
         
         # Summary
         success_count = len(image_files) - failed_files
-        print(f"✅ Processed {success_count}/{len(image_files)} files successfully")
-        print(f"🔑 Total keypoints detected: {total_points}")
+        logger.info("Processed %d/%d files successfully", success_count, len(image_files))
+        logger.info("Total keypoints detected: %d", total_points)
         if failed_files > 0:
-            print(f"❌ Failed files: {failed_files}")
+            logger.warning("Failed files: %d", failed_files)
         
         return total_points
 
