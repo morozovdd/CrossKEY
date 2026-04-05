@@ -72,7 +72,7 @@ cd CrossKEY
 ```
 
 This will:
-- Set up Python environment with Poetry
+- Set up Python environment with uv
 - Install dependencies
 - Compile external libraries (SIFT3D)
 - Create necessary directories

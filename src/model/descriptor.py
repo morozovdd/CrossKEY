@@ -202,9 +202,12 @@ class Descriptor(pl.LightningModule):
         # Update loss function with current epoch for curriculum learning
         self.loss_fn.update_epoch(self.current_epoch)
         
-        # Calculate loss
-        coordinates = batch.get('point', None)
-        loss, components = self.loss_fn(anchor_output, positive_output, coordinates=coordinates)
+        # Calculate loss (pass coordinates for spatial mining when using triplet loss)
+        if isinstance(self.loss_fn, CurriculumTripletLoss):
+            coordinates = batch.get('point', None)
+            loss, components = self.loss_fn(anchor_output, positive_output, coordinates=coordinates)
+        else:
+            loss, components = self.loss_fn(anchor_output, positive_output)
         
         # Log metrics
         self.log('train/loss', loss, on_step=False, on_epoch=True, prog_bar=True)
