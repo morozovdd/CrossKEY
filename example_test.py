@@ -100,7 +100,7 @@ def main():
             data_dir=str(data_dir),
             batch_size=config.get('data', {}).get('batch_size', 256),
             num_workers=config.get('data', {}).get('num_workers', 0),
-            patch_size=(config.get('patch_size', 32),) * 3,
+            patch_size=(config.get('data', {}).get('patch_size', 32),) * 3,
             grid_spacing=config.get('data', {}).get('grid_spacing', 8)
         )
         

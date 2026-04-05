@@ -277,7 +277,7 @@ class DescriptorDataModule(pl.LightningDataModule):
             
         return heatmap_candidates[0]
     
-    def _load_heatmap_data(self, heatmap_file: Path) -> Tuple[torch.Tensor, torch.Tensor]:
+    def _load_heatmap_data(self, heatmap_file: Path) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """Load heatmap and create FOV mask and probability distribution."""
         heatmap_data = load_nifti(heatmap_file)
         heatmap = torch.from_numpy(heatmap_data).float()

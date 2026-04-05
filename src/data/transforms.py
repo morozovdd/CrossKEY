@@ -1,12 +1,7 @@
 import torch
 import torch.nn.functional as F
 import numpy as np
-from typing import Tuple, Optional
-
-import torch
-import numpy as np
-import torch.nn.functional as F
-from typing import Optional, Tuple, Dict
+from typing import Dict, Optional, Tuple
 
 class Rotate3D:
     """Apply 3D rotation to a patch around its center."""

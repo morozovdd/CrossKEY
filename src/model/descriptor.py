@@ -172,7 +172,7 @@ class Descriptor(pl.LightningModule):
         
         Updates dataset parameters like rotation angles and resamples points.
         """
-        dataset = self.trainer.train_dataloader.dataset
+        dataset = self.trainer.datamodule.train_dataset
         
         # Update maximum rotation angle
         dataset.update_angle(self.current_epoch)
