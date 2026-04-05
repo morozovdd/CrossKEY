@@ -40,7 +40,7 @@ Intraoperative registration of real-time ultrasound (iUS) to preoperative Magnet
 
 - Python >= 3.12
 - [uv](https://docs.astral.sh/uv/) for dependency management
-- Linux (required for SIFT3D compilation; see `setup.sh` for details)
+- Linux or macOS (for SIFT3D compilation; macOS requires [Homebrew](https://brew.sh))
 
 ### Installation
 
