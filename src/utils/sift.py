@@ -66,6 +66,13 @@ class SIFT3D():
         self.sigma_n = sigma_n
         self.sigma0 = sigma0
 
+        if not os.path.isfile(self.executable):
+            raise FileNotFoundError(
+                f"SIFT3D binary not found at {self.executable}. "
+                "Run ./setup.sh on Linux to compile it, or see "
+                "https://github.com/bbrister/SIFT3D for manual installation."
+            )
+
     def preprocess_nifti_for_sift3d(self, input_file, output_file=None):
         """
         Preprocess NIfTI file by setting the IJK to RAS matrix to have diagonal [-1, -1, 1, 1].

@@ -39,7 +39,11 @@ def main():
     )
 
     os.makedirs(args.output_dir, exist_ok=True)
-    sift = SIFT3D()
+    try:
+        sift = SIFT3D()
+    except FileNotFoundError as e:
+        logger.error("%s", e)
+        sys.exit(1)
 
     mr_files = get_nifti_files(os.path.join(args.input_dir, "mr"))
     if mr_files:
