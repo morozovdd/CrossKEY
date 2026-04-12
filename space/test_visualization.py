@@ -39,7 +39,7 @@ def test_create_isosurface_trace():
     coords = np.mgrid[:32, :32, :32].astype(float)
     center = np.array([16, 16, 16])[:, None, None, None]
     vol = np.exp(-np.sum((coords - center) ** 2, axis=0) / 50).astype(np.float32)
-    trace = create_isosurface_trace(vol, level=0.3, color="blue", name="test")
+    trace = create_isosurface_trace(vol, level=0.3, colorscale="Gray", name="test")
     assert isinstance(trace, go.Mesh3d)
     assert len(trace.x) > 0
 
@@ -54,7 +54,8 @@ def test_create_keypoint_trace():
 def test_create_keypoint_trace_with_offset():
     pts = np.array([[1, 2, 3]], dtype=float)
     trace = create_keypoint_trace(pts, color="red", name="kp", offset_x=100)
-    assert trace.x[0] == 101.0
+    # Axis remap: data[1] -> Plotly x, so x = pts[1] + offset = 2 + 100 = 102
+    assert trace.x[0] == 102.0
 
 
 def test_create_match_lines():
@@ -63,6 +64,7 @@ def test_create_match_lines():
     trace = create_match_lines(src, tgt, color="green", name="matches", offset_x=50)
     assert isinstance(trace, go.Scatter3d)
     assert len(trace.x) == 6
+    # Axis remap: data[1] -> Plotly x. src[0]=[0,0,0] -> x=src[1]=0; tgt[0]=[1,1,1] -> x=tgt[1]+50=51
     assert trace.x[0] == 0.0
     assert trace.x[1] == 51.0
 

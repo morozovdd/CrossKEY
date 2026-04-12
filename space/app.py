@@ -72,10 +72,10 @@ def update_demo(
 
     return (
         fig,
-        f"{metrics['num_matches']}",
-        f"{metrics['num_correct']}",
-        f"{metrics['precision']:.1f}%",
-        f"{metrics['matching_score']:.4f}",
+        metrics['num_matches'],
+        metrics['num_correct'],
+        round(metrics['precision'], 1),
+        round(metrics['matching_score'], 4),
     )
 
 
@@ -131,10 +131,10 @@ def update_custom(
 
     return (
         fig,
-        f"{metrics['num_matches']}",
-        f"{metrics['num_correct']}",
-        f"{metrics['precision']:.1f}%",
-        f"{metrics['matching_score']:.4f}",
+        metrics['num_matches'],
+        metrics['num_correct'],
+        round(metrics['precision'], 1),
+        round(metrics['matching_score'], 4),
     )
 
 
@@ -145,10 +145,7 @@ with gr.Blocks(
 ) as demo:
     gr.Markdown(
         "# CrossKEY\n"
-        "**3D Cross-modal Keypoint Descriptor for MR-US Matching and Registration**\n\n"
-        "[Paper (IEEE TMI)](https://doi.org/10.1109/TMI.2026.3680352) | "
-        "[Code](https://github.com/morozovdd/CrossKEY) | "
-        "[arXiv](https://arxiv.org/abs/2507.18551)"
+        "**3D Cross-modal Keypoint Descriptor for MR-US Matching and Registration**"
     )
 
     with gr.Tabs():
@@ -172,12 +169,13 @@ with gr.Blocks(
                     )
 
                     gr.Markdown("### Results")
-                    with gr.Row():
-                        demo_n_matches = gr.Textbox(label="Matches", interactive=False)
-                        demo_n_correct = gr.Textbox(label="Correct", interactive=False)
-                    with gr.Row():
-                        demo_precision = gr.Textbox(label="Precision", interactive=False)
-                        demo_match_score = gr.Textbox(label="Match Score", interactive=False)
+                    with gr.Group():
+                        with gr.Row():
+                            demo_n_matches = gr.Number(label="Matches", interactive=False)
+                            demo_n_correct = gr.Number(label="Correct", interactive=False)
+                        with gr.Row():
+                            demo_precision = gr.Number(label="Precision (%)", interactive=False)
+                            demo_match_score = gr.Number(label="Match Score", interactive=False)
 
                 with gr.Column(scale=3):
                     demo_plot = gr.Plot(label="3D Matching Visualization")
@@ -226,12 +224,13 @@ with gr.Blocks(
                     )
 
                     gr.Markdown("### Results")
-                    with gr.Row():
-                        custom_n_matches = gr.Textbox(label="Matches", interactive=False)
-                        custom_n_correct = gr.Textbox(label="Correct", interactive=False)
-                    with gr.Row():
-                        custom_precision = gr.Textbox(label="Precision", interactive=False)
-                        custom_match_score = gr.Textbox(label="Match Score", interactive=False)
+                    with gr.Group():
+                        with gr.Row():
+                            custom_n_matches = gr.Number(label="Matches", interactive=False)
+                            custom_n_correct = gr.Number(label="Correct", interactive=False)
+                        with gr.Row():
+                            custom_precision = gr.Number(label="Precision (%)", interactive=False)
+                            custom_match_score = gr.Number(label="Match Score", interactive=False)
 
                 with gr.Column(scale=3):
                     custom_plot = gr.Plot(label="3D Matching Visualization")
@@ -264,4 +263,7 @@ with gr.Blocks(
 
 
 if __name__ == "__main__":
-    demo.launch(theme=gr.themes.Soft())
+    demo.launch(
+        theme=gr.themes.Soft(),
+        css="footer {display: none !important;}",
+    )

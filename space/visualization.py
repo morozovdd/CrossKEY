@@ -29,24 +29,33 @@ def scale_points(
 def create_isosurface_trace(
     volume: np.ndarray,
     level: float,
-    color: str,
+    colorscale: str = "Gray",
     opacity: float = 0.15,
     name: str = "",
     offset_x: float = 0.0,
 ) -> go.Mesh3d:
-    """Create a Mesh3d trace from a volume isosurface via marching cubes."""
+    """Create a Mesh3d trace from a volume isosurface via marching cubes.
+
+    Uses vertex intensity from the original volume for natural coloring.
+    """
     verts, faces, _, _ = marching_cubes(volume, level=level)
+    # Sample volume intensity at each vertex for natural coloring
+    vi = np.clip(verts.astype(int), 0, np.array(volume.shape) - 1)
+    intensities = volume[vi[:, 0], vi[:, 1], vi[:, 2]]
+    # Axis remap: data (0,1,2) -> Plotly (z,x,y); negate axis 0 so cone points up
     return go.Mesh3d(
-        x=verts[:, 0] + offset_x,
-        y=verts[:, 1],
-        z=verts[:, 2],
+        x=verts[:, 1] + offset_x,
+        y=verts[:, 2],
+        z=-verts[:, 0],
         i=faces[:, 0],
         j=faces[:, 1],
         k=faces[:, 2],
+        intensity=intensities,
+        colorscale=colorscale,
         opacity=opacity,
-        color=color,
         name=name,
         showlegend=True,
+        showscale=False,
     )
 
 
@@ -59,10 +68,11 @@ def create_keypoint_trace(
     offset_x: float = 0.0,
 ) -> go.Scatter3d:
     """Create Scatter3d markers for keypoints."""
+    # Axis remap: data (0,1,2) -> Plotly (z,x,y); negate axis 0
     return go.Scatter3d(
-        x=points[:, 0] + offset_x,
-        y=points[:, 1],
-        z=points[:, 2],
+        x=points[:, 1] + offset_x,
+        y=points[:, 2],
+        z=-points[:, 0],
         mode="markers",
         marker=dict(size=size, color=color, opacity=opacity),
         name=name,
@@ -79,11 +89,12 @@ def create_match_lines(
     offset_x: float = 0.0,
 ) -> go.Scatter3d:
     """Create lines connecting matched source points to offset target points."""
+    # Axis remap: data (0,1,2) -> Plotly (z,x,y); negate axis 0
     lx, ly, lz = [], [], []
     for s, t in zip(src_pts, tgt_pts):
-        lx.extend([float(s[0]), float(t[0]) + offset_x, None])
-        ly.extend([float(s[1]), float(t[1]), None])
-        lz.extend([float(s[2]), float(t[2]), None])
+        lx.extend([float(s[1]), float(t[1]) + offset_x, None])
+        ly.extend([float(s[2]), float(t[2]), None])
+        lz.extend([-float(s[0]), -float(t[0]), None])
     return go.Scatter3d(
         x=lx, y=ly, z=lz,
         mode="lines",
@@ -113,14 +124,14 @@ def build_matching_figure(
     pts_mr_viz = scale_points(points_mr, padded_shape_mr, volume_mr.shape)
     pts_us_viz = scale_points(points_us, padded_shape_us, volume_us.shape)
 
-    # Side-by-side offset: MR on left, US on right
-    gap = volume_mr.shape[0] * 0.3
-    offset_x = volume_mr.shape[0] + gap
+    # Side-by-side offset along Plotly x (= data axis 1)
+    gap = volume_mr.shape[1] * 0.3
+    offset_x = volume_mr.shape[1] + gap
 
-    # Volume isosurfaces
+    # Volume isosurfaces with natural intensity coloring
     try:
         fig.add_trace(create_isosurface_trace(
-            volume_mr, level=mr_level, color="royalblue",
+            volume_mr, level=mr_level, colorscale="Gray",
             opacity=0.15, name="MR Surface",
         ))
     except ValueError:
@@ -128,7 +139,7 @@ def build_matching_figure(
 
     try:
         fig.add_trace(create_isosurface_trace(
-            volume_us, level=us_level, color="crimson",
+            volume_us, level=us_level, colorscale="Hot",
             opacity=0.15, name="US Surface", offset_x=offset_x,
         ))
     except ValueError:
@@ -187,19 +198,19 @@ def build_matching_figure(
             size=1.5, opacity=0.2, name="US Unmatched", offset_x=offset_x,
         ))
 
-    # Layout
-    prec = metrics.get("precision", 0)
-    n_matches = metrics.get("num_matches", 0)
+    # Layout -- no fixed width so Plotly fills the Gradio container
     fig.update_layout(
-        title=f"CrossKEY Matching -- {n_matches} matches, {prec:.1f}% precision",
         scene=dict(
             xaxis=dict(visible=False),
             yaxis=dict(visible=False),
             zaxis=dict(visible=False),
             aspectmode="data",
+            camera=dict(
+                up=dict(x=0, y=0, z=1),
+                eye=dict(x=0, y=-1.8, z=0.3),
+            ),
         ),
-        width=900,
-        height=650,
+        height=700,
         margin=dict(l=0, r=0, t=40, b=0),
         legend=dict(
             yanchor="top", y=0.99,
