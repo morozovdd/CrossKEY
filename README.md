@@ -122,7 +122,9 @@ CrossKEY/
 │       └── utils.py          # NIfTI I/O utilities
 ├── scripts/
 │   ├── run_sift.py           # SIFT3D keypoint extraction
-│   └── create_heatmaps.py    # Probabilistic keypoint heatmaps
+│   ├── create_heatmaps.py    # Probabilistic keypoint heatmaps
+│   └── precompute_demo.py    # Generate data for HF Space demo
+├── space/                     # HuggingFace Space demo app
 ├── configs/                   # YAML configuration files
 ├── data/img/                  # Example data (Case059)
 ├── example_train.py           # Training entry point
