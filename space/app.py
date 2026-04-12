@@ -142,6 +142,8 @@ def update_custom(
 
 with gr.Blocks(
     title="CrossKEY -- 3D Cross-modal Keypoint Matching",
+    theme=gr.themes.Soft(),
+    css="footer {display: none !important;}",
 ) as demo:
     gr.Markdown(
         "# CrossKEY\n"
@@ -263,7 +265,4 @@ with gr.Blocks(
 
 
 if __name__ == "__main__":
-    demo.launch(
-        theme=gr.themes.Soft(),
-        css="footer {display: none !important;}",
-    )
+    demo.launch()
