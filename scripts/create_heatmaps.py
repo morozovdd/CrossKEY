@@ -158,6 +158,21 @@ class HeatmapProcessor:
         if mr_heatmap.max() > 0 and synthetic_us_heatmap.max() > 0:
             combined_heatmap = self.combine_heatmaps(mr_heatmap, synthetic_us_heatmap)
             save_nifti(combined_heatmap, self.output_dir / 'main_heatmap.nii.gz', self.reference_nifti_path)
+
+            # Apply weighted FOV mask — Gaussian falloff from center of synthetic US FOV
+            synth_us_dir = self.data_dir / 'synthetic_us'
+            if synth_us_dir.exists():
+                fov_mask = np.zeros(volume_shape, dtype=bool)
+                for f in sorted(synth_us_dir.glob('*.nii.gz')):
+                    vol = load_nifti(str(f))
+                    fov_mask |= vol > 0
+                logger.info("Synthetic US FOV coverage: %d / %d voxels (%.1f%%)",
+                            fov_mask.sum(), fov_mask.size, 100 * fov_mask.sum() / fov_mask.size)
+                weighted_mask = self.create_weighted_fov_mask(fov_mask)
+                masked_heatmap = combined_heatmap * weighted_mask
+                masked_heatmap = self.normalize_map(masked_heatmap)
+                save_nifti(masked_heatmap, self.output_dir / 'main_heatmap.nii.gz', self.reference_nifti_path)
+                logger.info("Saved weighted FOV-masked heatmap as main_heatmap.nii.gz")
         else:
             logger.warning("One or both heatmaps are empty, skipping combined heatmap")
 

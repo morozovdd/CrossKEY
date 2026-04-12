@@ -497,23 +497,26 @@ class DescriptorTrainingDataset(BaseDescriptorDataset):
                 - style_idx: Style index used
         """
         point = self.points[idx]
-        
+
         # Determine patch extraction size (larger if augmenting)
         enlarge_factor = 1.5 if self.augment else 1.0
-        
+
+        # Pick a random style for each sample
+        style = torch.randint(0, self.num_styles, (1,)).item()
+
         # Extract patches
         mr_patch = self._extract_patch(self.mr, point, enlarge_factor)
-        synth_patch = self._extract_patch(self.synth_us[self.style_idx], point)
-        
+        synth_patch = self._extract_patch(self.synth_us[style], point)
+
         # Process patches
         mr_patch = self._process_mr_patch(mr_patch)
         synth_patch = self._process_us_patch(synth_patch)
-        
+
         return {
             'mr': mr_patch,
             'synth_us': synth_patch,
             'point': point,
-            'style_idx': torch.tensor(self.style_idx, dtype=torch.long)
+            'style_idx': torch.tensor(style, dtype=torch.long)
         }
 
 class DescriptorInferenceDataset(BaseDescriptorDataset):
@@ -578,7 +581,7 @@ class DescriptorInferenceDataset(BaseDescriptorDataset):
         
         self.grid_spacing = grid_spacing
         self.normalize = ZNormalize3D()
-        
+
         # Set MR points or sample new ones
         self.mr_points = mr_points if mr_points is not None else self._sample_points_efficiently()
         
@@ -648,7 +651,7 @@ class DescriptorInferenceDataset(BaseDescriptorDataset):
             coverage = patch_region.float().mean()
             
             # Include points with sufficient US coverage
-            if coverage > 0.1:  # At least 10% US data
+            if coverage > 0.9:  # At least 90% US data
                 valid_points.append(point)
         
         if not valid_points:

@@ -14,8 +14,8 @@ data:
 # Evaluation
 evaluation:
   knn_k: 1
-  distance_threshold: inf
+  distance_threshold: .inf
   ratio_threshold: 0.75
-  mutual: true
+  mutual: false
   metric: "euclidean"
   max_distance: 5.0

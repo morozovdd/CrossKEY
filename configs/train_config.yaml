@@ -1,55 +1,44 @@
-# Model architecture parameters
 model:
-  out_dim: 512                   # Output descriptor dimension
-  input_channels: 1              # Number of input channels
-
-# Loss function parameters
+  out_dim: 512
+  input_channels: 1
 loss:
-  type: "triplet"                # Type of loss: 'triplet', 'infonce', 'bce'
-  margin: 1.0                    # Margin for triplet loss
-  temperature: 0.1               # Temperature for InfoNCE loss
-  warmup_epochs: 200             # Number of epochs for curriculum learning
-  spatial_weight: 0.5            # Weight for spatial information
-  max_spatial_dist: 48.0         # Maximum spatial distance for weighting
-
-# Optimizer parameters
+  type: triplet
+  margin: 1.0
+  temperature: 0.1
+  warmup_epochs: 200
+  spatial_weight: 0.5
+  max_spatial_dist: 48.0
 optimizer:
-  learning_rate: 0.001          # Learning rate
-  weight_decay: 0.002          # Weight decay
-  eta_min: 0.000001              # Minimum learning rate for cosine annealing
-
-# Training parameters
+  learning_rate: 0.001
+  weight_decay: 0.002
+  eta_min: 1.0e-06
 trainer:
-  max_epochs: 2000               # Maximum number of training epochs
-  accelerator: "auto"            # Accelerator type ('cpu', 'gpu', 'auto')
-  devices: "auto"                # Number of devices
-  log_every_n_steps: 50          # Log every N steps
-
-# Data parameters
+  max_epochs: 2000
+  accelerator: auto
+  devices: auto
+  log_every_n_steps: 4
 data:
-  batch_size: 256                # Batch size
-  num_workers: 0                 # Number of data loading workers (0 = main process, fastest for in-memory data)
-  patch_size: 32                 # Size of extracted patches
-  num_samples: 1024              # Number of training samples per epoch
-  grid_spacing: 8                # Grid spacing for inference
-  augment: true                  # Enable data augmentation
-  max_angle: 30.0                # Maximum rotation angle for augmentation
-  initial_angle: 0.0             # Initial rotation angle
-  angle_warmup_epochs: 1000      # Number of epochs to warm up rotation angle
-
-# Evaluation parameters
+  batch_size: 256
+  num_workers: 8
+  patch_size: 32
+  num_samples: 1024
+  grid_spacing: 8
+  augment: true
+  max_angle: 30.0
+  initial_angle: 0.0
+  angle_warmup_epochs: 1000
 evaluation:
-  knn_k: 1                       # Number of nearest neighbors
-  distance_threshold: inf        # Distance threshold for matching
-  ratio_threshold: 0.8           # Ratio threshold for matching
-  mutual: true                   # Use mutual nearest neighbors
-  metric: "euclidean"            # Distance metric
-  max_distance: 5.0              # Maximum distance for correct matches
-
-# Logging configuration
+  knn_k: 1
+  distance_threshold: .inf
+  ratio_threshold: 0.8
+  mutual: true
+  metric: euclidean
+  max_distance: 5.0
 logger:
-  type: "tensorboard"            # Logger type: 'tensorboard' or 'wandb'
-  save_dir: "logs/"              # Directory to save logs
-  name: "descriptor_experiment"  # Experiment name
-  project: "crossmodal-descriptor"  # Project name (for wandb)
-  tags: ["3d", "descriptor"]  # Tags for experiment
+  type: tensorboard
+  save_dir: logs/
+  name: descriptor_experiment
+  project: crossmodal-descriptor
+  tags:
+  - 3d
+  - descriptor

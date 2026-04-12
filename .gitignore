@@ -217,3 +217,9 @@ docs/superpowers/
 # Data - include img folder but exclude generated outputs
 /data/heatmap/
 /data/sift_output/
+
+# Model checkpoints
+checkpoints/
+
+# Generated images
+*.png
