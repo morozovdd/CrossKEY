@@ -1,0 +1,4 @@
+crosskey @ git+https://github.com/morozovdd/CrossKEY.git
+gradio>=5.0,<6.0
+plotly>=6.0,<7.0
+scikit-image>=0.24,<1.0
